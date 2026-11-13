@@ -28,7 +28,26 @@ architectural change.
 - **Rollback:** previous code is commit `7ae67fa`; on the Pi: re-copy that commit with
   `git archive 7ae67fa | ssh ...` and rebuild.
 
-## Target board split over two messages — branch `feat/target-board-two-messages` (13 Nov 2026, NOT deployed, not committed)
+## Public on GitHub (13 Nov 2026) — https://github.com/ZuluBax/War-Intel-Bot (branch `main`)
+
+- **Public repo.** Owner's choice: keep it public, with Discord IDs and Pi details masked.
+  The docs use placeholders (`<NV_GUILD_ID>`, `<TEST_GUILD_ID>`, `<BOT_CLIENT_ID>`,
+  `<user>@<pi-host>`, …); the real values are in the git-ignored `PRIVATE_NOTES.md`
+  (local only). **Never commit real server/channel/role IDs, hostnames or keys.**
+- **History:** GitHub holds one snapshot commit on top of its MIT `LICENSE` commit, not
+  the 89 development commits, so the old IDs and personal email aren't published. The
+  full private history is kept locally on branch `archive/private-history`. Commits use
+  the GitHub no-reply email (set in this repo's git config).
+- **Licence:** MIT (chosen when the GitHub repo was created; replaces the old "TBD" file).
+- Deploy from `main` now (`git archive main | ssh ...`, DEPLOYMENT.md Option C). The
+  Pi runs the same code as `main` (deployed 13 Nov 09:47 UTC; only docs differ).
+
+## Target board split over two messages — LIVE on the Pi since 13 Nov 2026 09:47 UTC
+
+- **Deploy check:** clean start (`discord.ready` guilds=2, commands synced in both
+  servers); `target_board.trimmed` stopped; Crossfire's war 8 board now has a second
+  message (`extra_message_ids` set). Rollback: previous code = `archive/private-history`
+  commit `4a3517b`.
 
 - **Why:** Discord caps a message at 6000 characters. The test server (guild
   <TEST_GUILD_ID>) now tracks **Crossfire (37530)**; its war vs faction 9047 has 87

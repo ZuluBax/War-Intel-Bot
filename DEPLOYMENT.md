@@ -273,7 +273,7 @@ From the dev machine (only git-tracked files are sent — not `.venv`, `.env`,
 or the local database):
 
 ```bash
-git archive master | ssh <user>@<pi> "mkdir -p ~/torn-war-intelligence && tar -x -C ~/torn-war-intelligence"
+git archive main | ssh <user>@<pi> "mkdir -p ~/torn-war-intelligence && tar -x -C ~/torn-war-intelligence"
 scp .env.pi <user>@<pi>:~/torn-war-intelligence/.env
 ssh <user>@<pi> "chmod 600 ~/torn-war-intelligence/.env"
 ```
