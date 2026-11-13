@@ -1,6 +1,6 @@
 """Real-shaped Torn API v2 response fixtures.
 
-Captured from the live API on 2026-09-10 (faction 53228) via
+Captured from the live API on 2026-09-10 (faction 10001) via
 ``scripts/probe_torn.py`` and trimmed. Keep these in sync with
 ``docs/api-contracts.md`` if Torn changes a field.
 """
@@ -11,10 +11,10 @@ from typing import Any
 
 FACTION_BASIC: dict[str, Any] = {
     "basic": {
-        "id": 53228,
-        "name": "Null & Void",
-        "tag": "N&V",
-        "leader_id": 3954550,
+        "id": 10001,
+        "name": "Ours & Co",
+        "tag": "OUR",
+        "leader_id": 1000001,
         "co_leader_id": 0,
         "respect": 123456,
         "days_old": 400,
@@ -28,8 +28,8 @@ FACTION_BASIC: dict[str, Any] = {
 FACTION_MEMBERS: dict[str, Any] = {
     "members": [
         {
-            "id": 1785078,
-            "name": "Katz047",
+            "id": 1000011,
+            "name": "MemberOne",
             "level": 20,
             "days_in_faction": 18,
             "last_action": {"status": "Offline", "timestamp": 1789060391, "relative": "33 minutes ago"},
@@ -44,8 +44,8 @@ FACTION_MEMBERS: dict[str, Any] = {
             "is_revivable": True,
         },
         {
-            "id": 2185019,
-            "name": "Xapd0",
+            "id": 1000012,
+            "name": "MemberTwo",
             "level": 50,
             "days_in_faction": 243,
             "last_action": {"status": "Online", "timestamp": 1789056960, "relative": "1 hour ago"},
@@ -60,8 +60,8 @@ FACTION_MEMBERS: dict[str, Any] = {
             "is_revivable": True,
         },
         {
-            "id": 2250132,
-            "name": "nicekhid",
+            "id": 1000013,
+            "name": "MemberThree",
             "level": 40,
             "days_in_faction": 273,
             "last_action": {"status": "Offline", "timestamp": 1789037751, "relative": "6 hours ago"},
@@ -82,25 +82,25 @@ FACTION_MEMBERS: dict[str, Any] = {
 FACTION_RANKEDWARS_FINISHED: dict[str, Any] = {
     "rankedwars": [
         {
-            "id": 48328,
+            "id": 90001,
             "start": 1787860800,
             "end": 1788048496,
             "target": 4473,
-            "winner": 49384,
+            "winner": 20001,
             "factions": [
-                {"id": 49384, "name": "7DS*: Wrath", "score": 10228, "chain": 0},
-                {"id": 53228, "name": "Null & Void", "score": 5755, "chain": 0},
+                {"id": 20001, "name": "Foe*: One", "score": 10228, "chain": 0},
+                {"id": 10001, "name": "Ours & Co", "score": 5755, "chain": 0},
             ],
         },
         {
-            "id": 47882,
+            "id": 90002,
             "start": 1787256000,
             "end": 1787331623,
             "target": 5200,
-            "winner": 53228,
+            "winner": 10001,
             "factions": [
-                {"id": 51166, "name": "Bigger on the Inside", "score": 2633, "chain": 0},
-                {"id": 53228, "name": "Null & Void", "score": 7836, "chain": 0},
+                {"id": 20002, "name": "Second Rival", "score": 2633, "chain": 0},
+                {"id": 10001, "name": "Ours & Co", "score": 7836, "chain": 0},
             ],
         },
     ],
@@ -117,7 +117,7 @@ FACTION_RANKEDWARS_ACTIVE: dict[str, Any] = {
             "target": 5000,
             "winner": None,
             "factions": [
-                {"id": 53228, "name": "Null & Void", "score": 1200, "chain": 3},
+                {"id": 10001, "name": "Ours & Co", "score": 1200, "chain": 3},
                 {"id": 60001, "name": "Rival Crew", "score": 900, "chain": 0},
             ],
         },
@@ -153,8 +153,8 @@ def attack(
     attack_id: int,
     started: int,
     *,
-    attacker: tuple[int, str, int, str] | None = (2086615, "The_eVagabond", 53228, "Null & Void"),
-    defender: tuple[int, str, int, str] = (3983945, "NoZuaL", 60001, "Rival Crew"),
+    attacker: tuple[int, str, int, str] | None = (1000021, "Our_Hitter", 10001, "Ours & Co"),
+    defender: tuple[int, str, int, str] = (1000031, "TheirTarget", 60001, "Rival Crew"),
     result: str = "Attacked",
     respect_gain: float = 4.68,
     is_ranked_war: bool = True,

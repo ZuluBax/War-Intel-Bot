@@ -16,16 +16,16 @@ def _service(routes: dict[str, object]) -> FactionService:
 
 
 async def test_get_basic_returns_name() -> None:
-    svc = _service({r"/faction/53228/basic": FACTION_BASIC})
-    summary = await svc.get_basic(53228)
-    assert summary.faction_id == 53228
-    assert summary.name == "Null & Void"
+    svc = _service({r"/faction/10001/basic": FACTION_BASIC})
+    summary = await svc.get_basic(10001)
+    assert summary.faction_id == 10001
+    assert summary.name == "Ours & Co"
 
 
 async def test_get_members_parses_real_shape() -> None:
-    svc = _service({r"/faction/49384/members": FACTION_MEMBERS})
-    summary = await svc.get_members(49384)
-    assert [m.player_id for m in summary.members] == [1785078, 2185019, 2250132]
+    svc = _service({r"/faction/20001/members": FACTION_MEMBERS})
+    summary = await svc.get_members(20001)
+    assert [m.player_id for m in summary.members] == [1000011, 1000012, 1000013]
 
     katz, xapd, nice = summary.members
     assert katz.level == 20
@@ -40,17 +40,17 @@ async def test_get_members_parses_real_shape() -> None:
 async def test_get_faction_combines_basic_and_members() -> None:
     svc = _service(
         {
-            r"/faction/53228/basic": FACTION_BASIC,
-            r"/faction/53228/members": FACTION_MEMBERS,
+            r"/faction/10001/basic": FACTION_BASIC,
+            r"/faction/10001/members": FACTION_MEMBERS,
         }
     )
-    summary = await svc.get_faction(53228)
-    assert summary.name == "Null & Void"
+    summary = await svc.get_faction(10001)
+    assert summary.name == "Ours & Co"
     assert len(summary.members) == 3
 
 
 async def test_get_members_tolerates_dict_keyed_members() -> None:
-    svc = _service({r"/faction/1/members": {"members": {"1785078": FACTION_MEMBERS["members"][0]}}})
+    svc = _service({r"/faction/1/members": {"members": {"1000011": FACTION_MEMBERS["members"][0]}}})
     summary = await svc.get_members(1)
     assert len(summary.members) == 1
 
@@ -58,7 +58,7 @@ async def test_get_members_tolerates_dict_keyed_members() -> None:
 async def test_get_members_skips_rows_without_id() -> None:
     svc = _service({r"/faction/1/members": {"members": [{"name": "no id"}, FACTION_MEMBERS["members"][0]]}})
     summary = await svc.get_members(1)
-    assert [m.player_id for m in summary.members] == [1785078]
+    assert [m.player_id for m in summary.members] == [1000011]
 
 
 async def test_empty_torn_key_raises() -> None:
@@ -116,5 +116,5 @@ async def test_get_members_asks_torn_for_an_uncached_answer() -> None:
             return await super().get(path, params)
 
     svc = FactionService(cast(TornClient, _Recording({r"/members": FACTION_MEMBERS})))
-    await svc.get_members(49384)
+    await svc.get_members(20001)
     assert seen and seen[0] is not None and isinstance(seen[0].get("timestamp"), int)

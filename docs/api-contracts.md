@@ -30,7 +30,7 @@ project.
 | Player status source | `/v2/user/{id}` `profile`/`status` — hospital/jail/travel + `until` | Shape **pending live check** |
 | Bulk user endpoint | **does not exist** — status refresh is one request per player | Verified (sibling project) |
 
-### Live probe results (2026-09-10, faction 53228)
+### Live probe results (2026-09-10, our faction)
 
 The configured key (owner is a faction member) was probed with
 `scripts/probe_torn.py`. Confirmed:

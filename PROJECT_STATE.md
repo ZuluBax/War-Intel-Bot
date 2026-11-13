@@ -19,8 +19,8 @@ architectural change.
   the owner's password manager — Railway was the only other copy.
 - **Startup check (08:47 UTC):** clean — `database.schema_ready`, `discord.ready`
   guilds=2, global + both servers' commands synced, no `crypto.key_mismatch`, no
-  `war.stale_war_closed` (no stuck wars). Guild <NV_GUILD_ID> registered war 52019
-  vs Dark Angels Elite as already WAR_FINISHED (fought while the bot was offline:
+  `war.stale_war_closed` (no stuck wars). Guild <NV_GUILD_ID> registered war <TORN_WAR_ID>
+  vs <ENEMY_FACTION> as already WAR_FINISHED (fought while the bot was offline:
   history only, no hits/summary).
 - **Action needed:** guild **<TEST_GUILD_ID>**'s saved Torn key is rejected by Torn
   (`TornAPIAuthError: Incorrect key`, every minute) — its admins must run
@@ -45,12 +45,12 @@ architectural change.
 ## Target board split over two messages — LIVE on the Pi since 13 Nov 2026 09:47 UTC
 
 - **Deploy check:** clean start (`discord.ready` guilds=2, commands synced in both
-  servers); `target_board.trimmed` stopped; Crossfire's war 8 board now has a second
+  servers); `target_board.trimmed` stopped; Faction B's war 8 board now has a second
   message (`extra_message_ids` set). Rollback: previous code = `archive/private-history`
   commit `4a3517b`.
 
 - **Why:** Discord caps a message at 6000 characters. The test server (guild
-  <TEST_GUILD_ID>) now tracks **Crossfire (37530)**; its war vs faction 9047 has 87
+  <TEST_GUILD_ID>) now tracks **Faction B (<FACTION_B_ID>)**; its war vs faction <ENEMY_FACTION_ID> has 87
   enemies and the board was shortening every line and still dropping 17
   (`target_board.trimmed total=87 shown=70`).
 - **Now (owner's choice, keep full detail):** full lines in one message if they fit,
@@ -150,13 +150,13 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
 - **Deploy check (08:21-08:22 UTC):** clean start, `overdoses` table created, commands synced
   on both servers, boards publishing, 0 errors / 0 x 403 / 0 x 429 in the first minute (only
   the usual "davey not installed" voice warning). Rollback target: deployment 1c99e9dd.
-- **First live overdoses (proves the `details` match):** DoctorB (1796785) and Tomspy77
-  (4408626), Xanax, wars 5 + 6 (same enemy, both servers). Checked against status history:
+- **First live overdoses (proves the `details` match):** EnemyPlayer1 (<PLAYER_ID>) and EnemyPlayer2
+  (<PLAYER_ID>), Xanax, wars 5 + 6 (same enemy, both servers). Checked against status history:
   both stays began after the 6 Oct 12:04 announcement, so `before_watch=False` is right.
   Their `first_seen_at` was the deploy time (feature not live yet); backdated by hand on
-  9 Oct to the first hospital snapshot of the stay (DoctorB 8 Oct 19:43:54, Tomspy77 9 Oct
+  9 Oct to the first hospital snapshot of the stay (EnemyPlayer1 8 Oct 19:43:54, EnemyPlayer2 9 Oct
   01:24:24 UTC; +4s on war 6). OD stays seen here were 74h59m, not 80-83h — don't key on length.
-- **N&V 429s — resolved by their own switch, not code (9 Oct):** N&V (guild <NV_GUILD_ID>,
+- **Faction A 429s — resolved by their own switch, not code (9 Oct):** Faction A (guild <NV_GUILD_ID>,
   war 6) has run `/setup board` in 5 admin-made channels (`guild_board_channels`), so boards
   no longer share one channel's edit bucket. 0 rate-limit / skipped-job lines in the first
   ~23 min after deploy (was ~5/min). **Confirmed in war (20:00-20:28 UTC, 9 Oct):** war went
@@ -167,7 +167,7 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
   NOT built — no server uses single-channel mode; build it only if one goes back to it.
 - **403 back-off (3542e38):** per-war mode checks Manage Channels (from cache) before
   creating anything. Without it: no create is tried, boards keep posting in whatever
-  channel they already had (N&V: back to #war-utilities), one `war.manage_channels_missing`
+  channel they already had (Faction A: back to #war-utilities), one `war.manage_channels_missing`
   warning. A create Discord refuses anyway backs off 10 min (`_CREATE_RETRY_SECONDS`,
   in memory — a restart retries once). Still no in-Discord notice to the server's admins.
 - **Overdoses (b7dddaa):** owner wanted enemies who overdosed since the war was announced.
@@ -184,14 +184,14 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
 
 - **Deploy check:** clean start, schema ready (new table created), `/setup board` synced to
   both servers (10 commands each), test server publishing normally.
-- **N&V at deploy time (not caused by it):** at 19:49:54 UTC someone in N&V cleared
+- **Faction A at deploy time (not caused by it):** at 19:49:54 UTC someone in Faction A cleared
   `/setup channel` with Manage Channels already removed, so per-war mode tries to create
   channels every 15s -> `403 Missing Permissions (50013)`; information + stats boards stop
   updating (targets/activity still edit the old #war-utilities messages). Resolves once they
   run `/setup board` in their own channels. Possible follow-up: back off / tell the admin
   instead of retrying a forbidden create every tick.
 
-- **Why:** N&V's owner won't give the bot Manage Channels (trust). Wants the 5-channel
+- **Why:** Faction A's owner won't give the bot Manage Channels (trust). Wants the 5-channel
   layout anyway, with channels they made themselves.
 - **How:** admin makes `war-information`, `enemy-stats`, `target-board`, `war-log`,
   `enemy-activity`, runs `/setup board` in each. Board is guessed from the channel name
@@ -206,7 +206,7 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
   `war.board_channel_missing` (other boards carry on).
 - **Invite without Manage Channels:** permissions `117760` (link in `docs/INSTALL_GUIDE.md`).
   Existing servers can just switch the permission off on the bot's role.
-- **N&V switch-over:** they can do it mid-war; boards not moved yet keep posting in
+- **Faction A switch-over:** they can do it mid-war; boards not moved yet keep posting in
   #war-utilities. Old posts there stop updating — delete by hand.
 
 ## Status: LIVE on Railway (deployed 2026-10-01 18:24 UTC, deployment c3de62eb, commit e94a475) — duplicate #war-information channels fixed
@@ -222,10 +222,10 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
   (1 call, not fetch+edit).
 - **Deploy check:** 0 `war.channel_created` in the first 4 min. Owner to delete the
   leftover #war-information channels by hand (keep the newest).
-- **Still open:** N&V single-channel mode still gets Discord 429s (~5/min) on the
+- **Still open:** Faction A single-channel mode still gets Discord 429s (~5/min) on the
   targets + stats boards — their content really changes every 15s and all boards share
   one channel's edit bucket, so the 15s job sometimes overruns and skips. Option: slower
-  refresh for those boards in single-channel mode. Not decided. **-> Resolved 9 Oct by N&V
+  refresh for those boards in single-channel mode. Not decided. **-> Resolved 9 Oct by Faction A
   moving to `/setup board` (see top entry).**
 
 ## Status: LIVE on Railway (deployed 2026-09-29 19:28 UTC, deployment fad60977, commit 8ad69e8) — flights out listed under their destination country
@@ -241,7 +241,7 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
 
 ## Status: LIVE on Railway (deployed 2026-09-29 12:45 UTC, deployment d5338193) — `/setup channel` refuses channels the bot can't post in
 
-- **Incident (Null & Void, guild <NV_GUILD_ID>, war row 4, 29 Sep):** setup at
+- **Incident (Faction A, guild <NV_GUILD_ID>, war row 4, 29 Sep):** setup at
   12:12 worked; its own category + 5 channels filled at 12:13. At 12:15 an admin ran
   `/setup channel #war-utilities`. That channel denies @everyone View Channel and has no
   overwrite for the bot role (`War Intel Bot` <BOT_ROLE_ID>), so from 12:16 every
@@ -249,17 +249,17 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
 - **Fix:** `/setup channel` checks View / Send / Embed Links / Read History for the bot
   and refuses (names what's missing) instead of saving. `upsert_channel` clears
   `live_message_id` when a purpose moves to a different channel.
-- **N&V then let the bot into #war-utilities** (posting worked, but all 5 boards in one
+- **Faction A then let the bot into #war-utilities** (posting worked, but all 5 boards in one
   channel). **Second fix (deployed 18:52 UTC, deployment ad765ad4, commit e79d12e):**
   clearing `/setup channel` mid-war kept reusing the shared channel for all purposes
   (the rows still pointed at it and it exists). Per-war mode now skips a channel held
   by 2+ purposes, so the 5 channels are created.
-- **N&V decided (29 Sep) to stay in single-channel mode (#war-utilities)** — not
+- **Faction A decided (29 Sep) to stay in single-channel mode (#war-utilities)** — not
   running `/setup channel` to clear it. Their choice; nothing pending.
 - **If they ever switch:** `/setup channel` with the box empty. Verify in logs:
   `war.category_created` + 5x `war.channel_created` for war_row_id=4. Old posts in
   #war-utilities stop updating and can be deleted by hand.
-- N&V's bot role has perms `85008` (old invite, no Attach Files) — re-invite with the
+- Faction A's bot role has perms `85008` (old invite, no Attach Files) — re-invite with the
   `117776` link in `docs/INSTALL_GUIDE.md` to get the end-of-war spreadsheet.
 - Admin-facing guide: `docs/INSTALL_GUIDE.md` / `.txt`.
 - Open: guild <TEST_GUILD_ID> (war row 3) hits Torn `error 5: Too many requests`
@@ -366,7 +366,7 @@ mid-war. Deploy after the war (or when the owner says). 524 tests pass, ruff + m
   landing check on 22 Sep (7 flights, new to the fit, landings watched every 30 s):
   bot's windows 7/7, FFScouter 7/7, near-identical windows. Small sample; it used
   FFScouter's take-off times (the bot's own are within ~60 s, allowed for in the window).
-- **Re-fit + bigger tests (same day):** re-fitted on 3,672 flights (53228 + 7 past
+- **Re-fit + bigger tests (same day):** re-fitted on 3,672 flights (<FACTION_A_ID> + 7 past
   opponents). The earlier fit scored 98.3% vs FFScouter 97.7% on 3,202 unseen flights.
   Final fit on a hold-out of 1,252 flights (Mayans MC 50228, Big Wheelers 1251 — the
   user gave "3951071" for Big Wheelers; that's co-leader Reyz's player ID): 99.8% vs
@@ -598,7 +598,7 @@ refresh and read as out of date. Removed the `ST` column (OK/HOSP/JAIL/TRVL) fro
 
 ## Status: LIVE on Railway (deployed 2026-09-19, commit 073ce09) — `RW: yes/no` in the war log + a paste-ready hits file for the payout sheet
 
-The owner's admins pay members from a Google Sheet (`N&V Spreadsheet`, one tab per
+The owner's admins pay members from a Google Sheet (`Faction A Spreadsheet`, one tab per
 war). Its raw-data block is columns A-G: `Attacker, Defender, Result, Respect,
 #Chain, RW?, Timestamp` (newest hit first); a per-member block to the right
 (`Total pay, RW, Attacks, Assists, Chain saver, Inside/Outside…`) plus a rates box
@@ -614,8 +614,8 @@ war). Its raw-data block is columns A-G: `Attacker, Defender, Result, Respect,
   weapon bonus **Warlord** shows up as `modifiers.warlord` (a respect multiplier: 1.0 =
   none; seen 1.15 / 1.17 / 1.18) and in `finishing_hit_effects`. So `RW? = warlord > 1`.
   Evidence it behaves like a weapon someone owns, from 1,682 real hits over 5 wars:
-  present on 20% of hits, but only 6 of 37 players ever had it (LordZulu 115 of 122
-  hits, MR_SPEAKER 89 of 166, The_eVagabond 0). **Limits, stated honestly:** we see the
+  present on 20% of hits, but only 6 of 37 players ever had it (PlayerA 115 of 122
+  hits, PlayerB 89 of 166, PlayerC 0). **Limits, stated honestly:** we see the
   Warlord *bonus*, not the weapon — a ranked-war weapon without that bonus would read
   `no`. (Torn's `is_ranked_war` flag and `is_war_hit` are separate facts and are *not*
   RW; an interim version wrongly used `is_war_hit` because the owner's first answer to
@@ -643,7 +643,7 @@ war). Its raw-data block is columns A-G: `Attacker, Defender, Result, Respect,
   carry `RW: …`; the end-of-war file covers every hit.
 - 281 tests pass (27 new); ruff + mypy clean. Break-it checks: the warlord threshold,
   the backfill and the gap logic each fail their tests when disabled. Built from the live
-  war's real data (362 hits): RW yes 70 / no 292 (19%, mostly LordZulu's hits).
+  war's real data (362 hits): RW yes 70 / no 292 (19%, mostly PlayerA's hits).
 - **Deploy verified 2026-09-19:** startup logged `database.column_added` for `war_hits.chain` and
   `war_hits.warlord`; a read-only query then showed 622 stored hits with 0 missing chain and 0
   missing warlord (backfill done), 91 `RW: yes`, 0 unposted; new war-log lines carry `RW: yes/no`.
@@ -881,7 +881,7 @@ cleaned up, so a server that runs many wars will accumulate old
 information/roster/targets messages in that one channel over time (each new
 war just posts fresh ones below them). 163 tests pass.
 
-- **Project:** `torn-war-intelligence-bot` (Railway workspace "zulubax's
+- **Project:** `torn-war-intelligence-bot` (Railway workspace "<owner>'s
   Projects", region `ams`, Hobby plan). One service, built directly from
   this repo's `Dockerfile` — no separate wrapper.
 - **Fixed to get there:** the `Dockerfile`'s `RUN --mount=type=cache,
@@ -938,7 +938,7 @@ Cloudflare scaffolding (`wrangler.jsonc`, `worker/`, `package.json`,
 created were deleted (`wrangler delete --name torn-war-intelligence-bot`).
 
 **Database: Supabase project `torn-war-intelligence` (ref `ueotecutycgbamikplew`,
-`eu-central-1`)** — org "ZuluBax's Org", free tier, Data API disabled on
+`eu-central-1`)** — org "<owner>'s Org", free tier, Data API disabled on
 purpose (the bot talks to Postgres directly via `asyncpg`, never needs
 Supabase's REST layer, so there's no reason to expose one). Connection uses
 the **Session Pooler** (`aws-0-eu-central-1.pooler.supabase.com:5432`, IPv4)

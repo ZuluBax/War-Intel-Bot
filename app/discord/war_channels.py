@@ -10,7 +10,7 @@
   existing channel instead — no category, no per-war channels.
   If the server has run ``/setup board`` in channels its admins made, each board
   goes to its own chosen channel and nothing is ever created — so the bot can run
-  without Manage Channels (Null & Void, Oct 2026).
+  without Manage Channels (Faction A, Oct 2026).
 * :class:`WarBoard` — post a channel's live embed the first time, then edit that
   same message on every refresh instead of posting a new one.
 
@@ -111,7 +111,7 @@ class WarChannelManager:
         self._single_channel_id = single_channel_id
         self._board_channels = dict(board_channels or {})
         # Without these, a server that took away Manage Channels got a forbidden create
-        # (403 / 50013) every 15s tick and a warning each time (Null & Void, 1 Oct 2026).
+        # (403 / 50013) every 15s tick and a warning each time (Faction A, 1 Oct 2026).
         self._create_blocked_until = 0.0
         self._warned_no_permission = False
 

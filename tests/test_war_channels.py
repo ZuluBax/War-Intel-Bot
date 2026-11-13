@@ -25,7 +25,7 @@ from tests.fake_gateway import FakeGuildGateway, discord_http_error
 
 async def _seed_war(db: Database, *, enemy_name: str = "Rival Crew") -> int:
     async with db.session() as session:
-        us = Faction(torn_faction_id=53228, name="Null & Void", is_ours=True)
+        us = Faction(torn_faction_id=10001, name="Ours & Co", is_ours=True)
         them = Faction(torn_faction_id=60001, name=enemy_name, is_ours=False)
         session.add_all([us, them])
         await session.flush()
@@ -33,7 +33,7 @@ async def _seed_war(db: Database, *, enemy_name: str = "Rival Crew") -> int:
             guild_id=99001,
             torn_war_id=77001,
             our_faction_id=us.id,
-            our_faction_name="Null & Void",
+            our_faction_name="Ours & Co",
             enemy_faction_id=them.id,
             enemy_faction_name=enemy_name,
             status="WAR_ACTIVE",
@@ -517,7 +517,7 @@ async def _add_war(
     enemy_torn_id: int = 60002,
 ) -> int:
     async with db.session() as session:
-        us = await session.scalar(select(Faction).where(Faction.torn_faction_id == 53228))
+        us = await session.scalar(select(Faction).where(Faction.torn_faction_id == 10001))
         assert us is not None
         them = Faction(torn_faction_id=enemy_torn_id, name=enemy_name, is_ours=False)
         session.add(them)
@@ -526,7 +526,7 @@ async def _add_war(
             guild_id=guild_id,
             torn_war_id=torn_war_id,
             our_faction_id=us.id,
-            our_faction_name="Null & Void",
+            our_faction_name="Ours & Co",
             enemy_faction_id=them.id,
             enemy_faction_name=enemy_name,
             status="WAR_ACTIVE",
@@ -727,7 +727,7 @@ async def test_moving_a_board_to_another_channel_forgets_the_old_live_message(
 async def test_clearing_setup_channel_mid_war_moves_boards_into_five_new_channels(
     database: Database,
 ) -> None:
-    # Null & Void, 29 Sep 2026: /setup channel was set after the war started, then
+    # Ours & Co, 29 Sep 2026: /setup channel was set after the war started, then
     # cleared. Every purpose row still pointed at the one war-room channel, which
     # exists, so per-war mode kept reusing it and never made the 5 channels.
     war_id = await _seed_war(database)
@@ -833,7 +833,7 @@ async def test_switching_from_one_room_to_own_channels_moves_the_boards(
 async def test_without_manage_channels_boards_stay_in_the_old_room_and_nothing_is_tried(
     database: Database,
 ) -> None:
-    # Null & Void, 1 Oct 2026: /setup channel cleared with Manage Channels already
+    # Ours & Co, 1 Oct 2026: /setup channel cleared with Manage Channels already
     # removed. Every 15s tick tried to create channels and got 403 (50013).
     war_id = await _seed_war(database)
     fake = FakeGuildGateway()

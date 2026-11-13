@@ -12,7 +12,7 @@ from app.torn.errors import TornAPIAccessLevelError
 from tests.conftest import FakeTornClient
 from tests.torn_fixtures import attack, attacks_page
 
-OUR_ID = 53228
+OUR_ID = 10001
 SINCE = datetime(2026, 9, 19, 18, 0, 0, tzinfo=UTC)
 T0 = int(SINCE.timestamp())
 
@@ -32,12 +32,12 @@ async def test_parses_a_real_shaped_attack() -> None:
     assert hit.attack_id == 1
     assert hit.started == datetime.fromtimestamp(T0 + 10, tz=UTC)
     assert (hit.attacker_id, hit.attacker_name, hit.attacker_faction_id) == (
-        2086615,
-        "The_eVagabond",
-        53228,
+        1000021,
+        "Our_Hitter",
+        10001,
     )
     assert (hit.defender_name, hit.defender_faction_id, hit.defender_faction_name) == (
-        "NoZuaL",
+        "TheirTarget",
         60001,
         "Rival Crew",
     )
@@ -47,7 +47,7 @@ async def test_parses_a_real_shaped_attack() -> None:
 
 
 async def test_stealthed_hit_on_us_has_no_attacker() -> None:
-    row = attack(2, T0 + 20, attacker=None, defender=(1, "Ours", OUR_ID, "Null & Void"))
+    row = attack(2, T0 + 20, attacker=None, defender=(1, "Ours", OUR_ID, "Ours & Co"))
     fake = FakeTornClient({r"/attacks": attacks_page(row)})
     [hit] = await _service(fake).list_attacks(OUR_ID, since=SINCE)
 

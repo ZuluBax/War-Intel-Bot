@@ -47,7 +47,7 @@ _STANDARD_MINUTES: dict[str, int] = {
 # plus/minus minutes). Torn makes every flight a little random — a few % either way,
 # and a minute or two on even the shortest hop — so a landing is a *window*.
 # Fitted on 22 Sep 2026 to 3,672 completed flights (FFScouter premium history for
-# faction 53228 and 7 past ranked-war opponents); the fit before this one scored 98.3%
+# our faction and 7 past ranked-war opponents); the fit before this one scored 98.3%
 # on 3,202 of these flights it had never seen (FFScouter's own windows: 97.7%).
 #   PI       n=2919  98.5% inside, median window 11 min (99% would need 14 min)
 #   Airline  n=695   99.1% inside, median 12 min

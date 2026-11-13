@@ -205,7 +205,7 @@ def register_setup(bot: TornWarIntelBot) -> None:
         if channel is not None:
             # Discord lets an admin pick a channel the bot is hidden from; accepting it
             # silently moved every board there and each post failed with 403 Missing
-            # Access (Null & Void, 29 Sep 2026). Refuse up front instead.
+            # Access (Faction A, 29 Sep 2026). Refuse up front instead.
             missing = missing_post_permissions(channel.permissions_for(channel.guild.me))
             if missing:
                 await interaction.response.send_message(

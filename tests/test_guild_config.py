@@ -25,13 +25,13 @@ async def test_not_ready_until_faction_and_torn_key_set(
     assert await service.resolve(GUILD) is None
     assert await service.list_ready() == []
 
-    await service.set_faction(GUILD, 53228, by=1)
+    await service.set_faction(GUILD, 10001, by=1)
     assert await service.resolve(GUILD) is None  # still no key
 
     await service.set_torn_key(GUILD, "torn-secret", by=1)
     resolved = await service.resolve(GUILD)
     assert resolved is not None
-    assert resolved.torn_faction_id == 53228
+    assert resolved.torn_faction_id == 10001
     assert resolved.torn_api_key == "torn-secret"
     assert resolved.ffscouter_api_key == "op-ffs"  # falls back to operator key
 
@@ -121,7 +121,7 @@ async def test_set_war_room_channel_and_clear(
 
 
 async def test_board_channels_set_replace_and_remove(service: GuildConfigService) -> None:
-    await service.set_faction(GUILD, 53228, by=1)
+    await service.set_faction(GUILD, 10001, by=1)
     await service.set_torn_key(GUILD, "torn-secret", by=1)
 
     await service.set_board_channel(GUILD, "information", 111, by=1)
@@ -157,7 +157,7 @@ def _with_other_key(database: Database) -> GuildConfigService:
 
 
 async def _save_keys(service: GuildConfigService, guild_id: int) -> None:
-    await service.set_faction(guild_id, 53228, by=1)
+    await service.set_faction(guild_id, 10001, by=1)
     await service.set_torn_key(guild_id, f"torn-{guild_id}", by=1)
     await service.set_ffscouter_key(guild_id, f"ffs-{guild_id}", by=1)
 
@@ -214,7 +214,7 @@ async def test_reset_clears_only_unreadable_keys_and_lets_the_bot_start(
     assert row is not None
     assert row.torn_api_key_enc is None
     assert row.ffscouter_api_key_enc is None
-    assert row.torn_faction_id == 53228  # everything else is kept
+    assert row.torn_faction_id == 10001  # everything else is kept
     assert row.war_intel_role_id == 777
     assert await new_key.resolve(GUILD) is None  # not ready until /setup torn-key again
 

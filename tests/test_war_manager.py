@@ -17,7 +17,7 @@ from app.war.roster import EnemyRosterService, Roster, RosterDiff
 from app.war.score import WarScore
 from app.war.target_service import TargetingService, TargetView
 
-OUR_ID = 53228
+OUR_ID = 10001
 ENEMY_ID = 60001
 GUILD_ID = 7
 
@@ -51,7 +51,7 @@ def _war(
         end=end,
         target_score=5000,
         factions=(
-            RankedWarFaction(OUR_ID, "Null & Void", 1200),
+            RankedWarFaction(OUR_ID, "Ours & Co", 1200),
             RankedWarFaction(ENEMY_ID, "Rival Crew", 900),
         ),
         winner_faction_id=winner,

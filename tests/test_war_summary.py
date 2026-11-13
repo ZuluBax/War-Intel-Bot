@@ -135,22 +135,22 @@ def _players(n: int):  # type: ignore[no-untyped-def]
 
 def test_scoreboard_table_and_totals() -> None:
     hits = [
-        _hit(1, 1, "LordZulu", "Attacked"),
-        _hit(2, 1, "LordZulu", "Lost"),
+        _hit(1, 1, "PlayerA", "Attacked"),
+        _hit(2, 1, "PlayerA", "Lost"),
         _hit(3, 2, "RatUser", "Assist"),
     ]
     [embed] = war_summary_embeds(
-        our_faction_name="Null & Void",
-        enemy_faction_name="Agents of Truth",
+        our_faction_name="Ours & Co",
+        enemy_faction_name="Enemy Crew",
         result="WIN",
         players=summarise_hits(hits),
     )
-    assert embed.title == "🏁 War summary · Null & Void vs Agents of Truth"
+    assert embed.title == "🏁 War summary · Ours & Co vs Enemy Crew"
     text = embed.description or ""
     assert "**2** players · **3** hits · won **1** · draw **0** · lost **1** · assist **1**" in text
     assert "PLAYER" in text and "HITS" in text
-    lord = next(line for line in text.splitlines() if line.startswith("LordZulu"))
-    assert lord.split() == ["LordZulu", "2", "1", "0", "1", "0"]
+    lord = next(line for line in text.splitlines() if line.startswith("PlayerA"))
+    assert lord.split() == ["PlayerA", "2", "1", "0", "1", "0"]
 
 
 def test_colour_follows_the_result() -> None:
@@ -224,13 +224,13 @@ async def test_the_scoreboard_posts_after_the_hits_and_the_war_ended_line_and_on
     await WarChannelManager(database, gateway).ensure_workspace(war_id)
 
     start_unix = int((utcnow() - timedelta(hours=1)).timestamp())
-    us = (11, "Alice", OUR_ID, "Null & Void")
+    us = (11, "Alice", OUR_ID, "Ours & Co")
     them = (99, "EnemyGuy", 60001, "Rival Crew")
     other = (98, "Bystander", 31337, "Some Other Faction")
     await _service(database, FakeTornClient({r"/attacks": attacks_page(
         attack(1, start_unix + 1, attacker=us, defender=them, result="Hospitalized"),
         attack(2, start_unix + 2, attacker=us, defender=them, result="Lost", respect_gain=0),
-        attack(3, start_unix + 3, attacker=(12, "Bob", OUR_ID, "Null & Void"), defender=them,
+        attack(3, start_unix + 3, attacker=(12, "Bob", OUR_ID, "Ours & Co"), defender=them,
                result="Assist", respect_gain=0),
         attack(4, start_unix + 4, attacker=us, defender=other, is_ranked_war=False),  # outside
         attack(5, start_unix + 5, attacker=them, defender=us),  # incoming
@@ -266,9 +266,9 @@ async def test_the_scoreboard_posts_after_the_hits_and_the_war_ended_line_and_on
     # The spreadsheet rides on the scoreboard message only — not on hits or the ended line.
     [(file_key, files)] = list(fake.attachments.items())
     assert file_key == (channel_id, posted[2][0])
-    assert [n.split("-null-")[0] for n, _ in files] == ["war-summary", "war-hits"]
+    assert [n.split("-ours-")[0] for n, _ in files] == ["war-summary", "war-hits"]
     name, content = files[0]
-    assert name.startswith("war-summary-null-void-vs-rival-crew-") and name.endswith(".csv")
+    assert name.startswith("war-summary-ours-co-vs-rival-crew-") and name.endswith(".csv")
     rows = list(csv.reader(io.StringIO(content.decode("utf-8-sig"))))
     assert rows[0][:3] == ["Player", "Player ID", "Hits"]
     assert rows[1] == ["Alice", "11", "2", "1", "0", "1", "0", "0"]
@@ -332,8 +332,8 @@ def test_csv_leaves_the_id_blank_when_torn_gave_none() -> None:
 
 def test_filename_names_both_factions_and_the_date() -> None:
     assert (
-        summary_filename("Null & Void", "Agents of Truth", T0)
-        == "war-summary-null-void-vs-agents-of-truth-2026-09-19.csv"
+        summary_filename("Ours & Co", "Enemy Crew", T0)
+        == "war-summary-ours-co-vs-enemy-crew-2026-09-19.csv"
     )
     assert summary_filename(None, None, T0) == "war-summary-us-vs-enemy-2026-09-19.csv"
 

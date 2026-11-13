@@ -33,7 +33,7 @@ def _next_war(*, start_in: timedelta) -> RankedWar:
         end=None,
         target_score=5000,
         factions=(
-            RankedWarFaction(OUR_ID, "Null & Void", 0),
+            RankedWarFaction(OUR_ID, "Ours & Co", 0),
             RankedWarFaction(60002, "Brand New Foe", 0),
         ),
     )

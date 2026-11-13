@@ -76,14 +76,14 @@ def test_time_order_is_kept_across_kinds_whatever_order_they_arrive_in() -> None
 
 
 def test_line_shows_london_time_names_result_and_respect() -> None:
-    line = hit_line(_hit(1, 8, attacker="The_eVagabond", defender="NoZuaL"))
-    assert line == r"`19:00:08` **The\_eVagabond** ➜ **NoZuaL** · Attacked · +4.68"
+    line = hit_line(_hit(1, 8, attacker="Our_Hitter", defender="TheirTarget"))
+    assert line == r"`19:00:08` **Our\_Hitter** ➜ **TheirTarget** · Attacked · +4.68"
 
 
 def test_outside_hit_names_the_faction_it_landed_on_but_a_war_hit_does_not() -> None:
-    outside = hit_line(_hit(1, 0, war=False, faction="Agents of Truth"))
+    outside = hit_line(_hit(1, 0, war=False, faction="Enemy Crew"))
     war = hit_line(_hit(2, 0, war=True, faction="Rival Crew"))
-    assert "Agents of Truth" in outside
+    assert "Enemy Crew" in outside
     assert "Rival Crew" not in war
 
 

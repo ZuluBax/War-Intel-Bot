@@ -119,6 +119,6 @@ def test_starts_with_a_bom_so_excel_reads_it() -> None:
 
 def test_filename_uses_the_hits_prefix() -> None:
     assert (
-        summary_filename("Null & Void", "Agents of Truth", T0, prefix="war-hits")
-        == "war-hits-null-void-vs-agents-of-truth-2026-09-19.csv"
+        summary_filename("Ours & Co", "Enemy Crew", T0, prefix="war-hits")
+        == "war-hits-ours-co-vs-enemy-crew-2026-09-19.csv"
     )

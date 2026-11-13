@@ -128,7 +128,7 @@ docker compose version                # confirm it works
 From your dev machine (adjust the IP / username for your Pi):
 
 ```bash
-scp -r "C:/Users/Zulu/Documents/Claude/torn-war-intelligence" pi@<PI_IP>:~/
+scp -r "<path-to>/torn-war-intelligence" pi@<PI_IP>:~/
 ```
 
 Then on the Pi: `cd ~/torn-war-intelligence`. Everything below runs from there.

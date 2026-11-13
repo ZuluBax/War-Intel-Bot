@@ -26,13 +26,13 @@ from app.war.score import WarScore, score_from_war
 from tests.fake_gateway import FakeGuildGateway
 from tests.test_war_channels import _seed_war
 
-OUR_ID = 53228
+OUR_ID = 10001
 ENEMY_ID = 60001
 
 
 def _score(**overrides: object) -> WarScore:
     values: dict[str, object] = {
-        "our_name": "Null & Void",
+        "our_name": "Ours & Co",
         "enemy_name": "Rival Crew",
         "our_score": 1200,
         "enemy_score": 900,
@@ -53,19 +53,19 @@ def test_score_from_war_is_from_our_side_whichever_order_torn_lists_the_factions
     war = _war(
         factions=(
             RankedWarFaction(ENEMY_ID, "Rival Crew", 900),
-            RankedWarFaction(OUR_ID, "Null & Void", 1200),
+            RankedWarFaction(OUR_ID, "Ours & Co", 1200),
         )
     )
     score = score_from_war(war, OUR_ID, finished=False, result=None)
     assert score is not None
-    assert (score.our_name, score.our_score) == ("Null & Void", 1200)
+    assert (score.our_name, score.our_score) == ("Ours & Co", 1200)
     assert (score.enemy_name, score.enemy_score) == ("Rival Crew", 900)
     assert score.target_score == 5000
     assert score.lead == 300
 
 
 def test_score_from_war_is_none_when_a_faction_is_missing() -> None:
-    war = _war(factions=(RankedWarFaction(OUR_ID, "Null & Void", 1200),))
+    war = _war(factions=(RankedWarFaction(OUR_ID, "Ours & Co", 1200),))
     assert score_from_war(war, OUR_ID, finished=False, result=None) is None
 
 
@@ -88,7 +88,7 @@ def _text(embed: object) -> str:
 def test_score_box_shows_both_scores_the_target_and_the_lead() -> None:
     text = _text(war_score_embed(_score()))
     assert "LIVE SCORE" in text
-    assert "Null & Void **1,200**" in text
+    assert "Ours & Co **1,200**" in text
     assert "Rival Crew **900**" in text
     assert "Target 5,000" in text
     assert "Leading by **300**" in text
@@ -101,7 +101,7 @@ def test_score_box_says_trailing_when_behind_and_tied_when_level() -> None:
 
 def test_score_box_shows_a_dash_not_a_fake_zero_for_a_missing_score() -> None:
     text = _text(war_score_embed(_score(our_score=None)))
-    assert "Null & Void **—**" in text
+    assert "Ours & Co **—**" in text
     assert "unavailable" in text
 
 

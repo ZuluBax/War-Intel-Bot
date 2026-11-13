@@ -38,7 +38,7 @@ from tests.torn_fixtures import attack, attacks_page
 
 UNIX_START = int((utcnow() - timedelta(hours=1)).timestamp())
 THEM = (777, "EnemyGuy", ENEMY_ID, "Rival Crew")
-US = (555, "OurGuy", OUR_ID, "Null & Void")
+US = (555, "OurGuy", OUR_ID, "Ours & Co")
 RANDOM = (888, "Bystander", 31337, "Some Other Faction")
 
 
@@ -46,7 +46,7 @@ async def _seed_war(
     db: Database, *, war_start: datetime | None, status: str = "WAR_ACTIVE"
 ) -> int:
     async with db.session() as session:
-        us = Faction(torn_faction_id=OUR_ID, name="Null & Void", is_ours=True)
+        us = Faction(torn_faction_id=OUR_ID, name="Ours & Co", is_ours=True)
         them = Faction(torn_faction_id=ENEMY_ID, name="Rival Crew", is_ours=False)
         session.add_all([us, them])
         await session.flush()
@@ -54,7 +54,7 @@ async def _seed_war(
             guild_id=99001,
             torn_war_id=77001,
             our_faction_id=us.id,
-            our_faction_name="Null & Void",
+            our_faction_name="Ours & Co",
             enemy_faction_id=them.id,
             enemy_faction_name="Rival Crew",
             status=status,

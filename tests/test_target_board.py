@@ -363,7 +363,7 @@ def _names(embed: discord.Embed, prefix: str) -> list[str]:
 
 
 def _war_sized_roster() -> list[TargetView]:
-    """87 enemies, like the live Crossfire war: too much for one message at full detail."""
+    """87 enemies, like the live real war: too much for one message at full detail."""
     def name(i: int) -> str:
         return f"Foe{i:03d}xx"
 
