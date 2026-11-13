@@ -1,0 +1,42 @@
+# Home-server / small-VPS deployment. `docker compose up -d` starts the bot +
+# Postgres and keeps them running across reboots (restart: unless-stopped).
+# See DEPLOYMENT.md for the full walk-through.
+
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Override the .env default so the container talks to the compose Postgres.
+      DATABASE_URL: postgresql+asyncpg://torn:${POSTGRES_PASSWORD:-torn}@postgres:5432/torn_war_intel
+      LOG_FORMAT: json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - bot_data:/app/data
+      # Persists config/secret.key across restarts IF CONFIG_ENCRYPTION_KEY is
+      # not set in .env. Setting CONFIG_ENCRYPTION_KEY in .env is preferred and
+      # makes this volume irrelevant.
+      - bot_config:/app/config
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: torn
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-torn}
+      POSTGRES_DB: torn_war_intel
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U torn -d torn_war_intel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bot_data:
+  bot_config:
+  pg_data:

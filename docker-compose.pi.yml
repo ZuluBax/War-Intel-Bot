@@ -1,0 +1,31 @@
+# Raspberry Pi / home-server deployment that keeps the existing Supabase database.
+#
+# Unlike docker-compose.yml (bot + its own empty Postgres), this runs the bot only
+# and takes DATABASE_URL from .env, so every server's /setup, war history and spy
+# reports carry over. Start with:
+#
+#   docker compose -f docker-compose.pi.yml up -d --build
+#
+# See DEPLOYMENT.md "Option C".
+
+services:
+  bot:
+    build: .
+    restart: unless-stopped  # back up after a crash or a Pi reboot
+    env_file: .env           # DISCORD_TOKEN, CONFIG_ENCRYPTION_KEY, DATABASE_URL, ...
+    environment:
+      LOG_FORMAT: json
+    volumes:
+      - bot_data:/app/data
+      - bot_config:/app/config
+    # Docker keeps container logs forever by default; on an SD card that slowly
+    # fills the disk. Cap them at 3 x 10 MB.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  bot_data:
+  bot_config:

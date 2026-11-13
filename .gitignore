@@ -1,0 +1,47 @@
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# Local database files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+data/
+
+# Secrets-at-rest encryption key (auto-generated if CONFIG_ENCRYPTION_KEY unset)
+config/secret.key
+config/*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Logs
+logs/
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Tooling artifacts
+.claude-flow/
+.claude/
+
+# uv
+# uv.lock IS committed on purpose (reproducible builds)
+
+# Real Discord IDs / Pi details behind the placeholders in the public docs
+PRIVATE_NOTES.md
