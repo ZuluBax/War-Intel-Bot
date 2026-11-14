@@ -28,7 +28,10 @@ architectural change.
 - **Rollback:** previous code is commit `7ae67fa`; on the Pi: re-copy that commit with
   `git archive 7ae67fa | ssh ...` and rebuild.
 
-## Hit feed refused → #war-log notice (14 Nov 2026) — built, NOT yet deployed
+## Hit feed refused → #war-log notice — LIVE on the Pi since 14 Nov 2026 19:17 UTC
+
+- **Deploy check:** clean start (`discord.ready` guilds=2, commands synced); war 8 logged
+  `war.hit_feed_notice_queued` then `war.log_published count=1` at 19:18. Rollback: `ddeddc9`.
 
 - **Found:** the test server's war (war 8, from 19:00 UTC 14 Nov) posted no hits. Its key
   owner is in the configured faction, but Torn answers `/faction/attacks` with error 7
