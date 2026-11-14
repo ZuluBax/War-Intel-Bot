@@ -28,6 +28,22 @@ architectural change.
 - **Rollback:** previous code is commit `7ae67fa`; on the Pi: re-copy that commit with
   `git archive 7ae67fa | ssh ...` and rebuild.
 
+## Hit feed refused → #war-log notice (14 Nov 2026) — built, NOT yet deployed
+
+- **Found:** the test server's war (war 8, from 19:00 UTC 14 Nov) posted no hits. Its key
+  owner is in the configured faction, but Torn answers `/faction/attacks` with error 7
+  ("Incorrect ID-entity relation"): the position lacks **Faction API Access**. Fix is
+  in Torn (grant it, or `/setup torn-key` with a member who has it), not in code.
+- **Why it was invisible:** `war.hit_sync_failed` is logged once per war, nothing in Discord.
+- **Change:** Torn error 7 → `TornAPIPrivateDataError` (subclass of `TornAPIRequestError`).
+  When the hit sync fails with that or `TornAPIAccessLevelError` (16), `WarManager`
+  queues one ⚠️ `HIT_FEED_BLOCKED` war-log event per war saying how to fix it. "Once" is
+  checked in the DB (`WarLogRepository.has_kind`), so a restart doesn't repost it.
+  Temporary errors (rate limit, backend) post nothing. No schema change.
+- **Recovery:** with no hits stored, the sync reads from the war's start, so fixing the
+  key while the war runs backfills every hit. Hits are NOT recovered if the war ends first.
+- **Tests:** 5 new in `test_war_hits.py`; related files pass one at a time; ruff + mypy clean.
+
 ## Public on GitHub (13 Nov 2026) — https://github.com/ZuluBax/War-Intel-Bot (branch `main`)
 
 - **Public repo.** Owner's choice: keep it public, with Discord IDs and Pi details masked.

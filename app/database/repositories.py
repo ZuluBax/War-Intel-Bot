@@ -509,6 +509,14 @@ class WarLogRepository:
         self._session.add(event)
         return event
 
+    async def has_kind(self, war_id: int, kind: str) -> bool:
+        found = await self._session.scalar(
+            select(WarLogEvent.id)
+            .where(WarLogEvent.war_id == war_id, WarLogEvent.kind == kind)
+            .limit(1)
+        )
+        return found is not None
+
     async def unposted_for_war(self, war_id: int) -> list[WarLogEvent]:
         result = await self._session.scalars(
             select(WarLogEvent)

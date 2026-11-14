@@ -37,10 +37,17 @@ class TornAPIRequestError(TornAPIError):
     """Any other documented Torn error code — carries Torn's own message."""
 
 
+class TornAPIPrivateDataError(TornAPIRequestError):
+    """Code 7: the selection is private to the key. For a faction's attack feed this
+    means the key owner's position lacks Faction API Access. A subclass so existing
+    ``TornAPIRequestError`` handlers keep catching it."""
+
+
 _ERROR_CODE_MAP: dict[int, type[TornAPIError]] = {
     1: TornAPIAuthError,
     2: TornAPIAuthError,
     5: TornAPIRateLimitError,
+    7: TornAPIPrivateDataError,
     8: TornAPIIPBlockError,
     9: TornAPITransientError,
     10: TornAPIAuthError,

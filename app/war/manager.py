@@ -36,6 +36,7 @@ from typing import Protocol
 from app.database.database import Database
 from app.database.models import War
 from app.database.repositories import FactionRepository, WarLogRepository, WarRepository
+from app.torn.errors import TornAPIAccessLevelError, TornAPIPrivateDataError
 from app.utils.logging import get_logger
 from app.utils.time import utcnow
 from app.war.activity import ActivitySummary
@@ -48,6 +49,8 @@ from app.war.roster import EnemyRosterService, Roster
 from app.war.score import WarScore, score_from_war
 from app.war.target_service import TargetingService, TargetView
 from app.war.warlog import (
+    HIT_FEED_BLOCKED_KIND,
+    hit_feed_blocked_event,
     roster_join_event,
     roster_left_event,
     state_change_event,
@@ -340,10 +343,37 @@ class WarManager:
                     error_type=type(exc).__name__,
                     detail=str(exc),
                 )
+            if isinstance(exc, (TornAPIPrivateDataError, TornAPIAccessLevelError)):
+                await self._note_hit_feed_blocked(
+                    war_row_id, access_level_too_low=isinstance(exc, TornAPIAccessLevelError)
+                )
             return
         self._hit_sync_warned.discard(war_row_id)
         if added:
             logger.info("war.hits_synced", war_row_id=war_row_id, new_hits=added)
+
+    async def _note_hit_feed_blocked(self, war_row_id: int, *, access_level_too_low: bool) -> None:
+        """Queue a one-off #war-log notice that Torn refuses the key the attack feed.
+
+        Once per war, checked in the DB rather than memory so a restart doesn't repost
+        it. The caller's next ``_publish_log`` delivers it."""
+        try:
+            async with self._db.session() as session:
+                logs = WarLogRepository(session)
+                if await logs.has_kind(war_row_id, HIT_FEED_BLOCKED_KIND):
+                    return
+                logs.add(
+                    hit_feed_blocked_event(war_row_id, access_level_too_low=access_level_too_low)
+                )
+        except Exception as exc:  # a DB hiccup here must never kill the tick
+            logger.error(
+                "war.hit_feed_notice_failed",
+                war_row_id=war_row_id,
+                error_type=type(exc).__name__,
+                detail=str(exc),
+            )
+            return
+        logger.info("war.hit_feed_notice_queued", war_row_id=war_row_id)
 
     async def _publish_score(
         self, assessment: WarAssessment, reconciled: _Reconciled | None

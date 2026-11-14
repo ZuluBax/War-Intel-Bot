@@ -193,6 +193,7 @@ _LOG_ICON: dict[str, str] = {
     "ROSTER_JOIN": "🆕",
     "ROSTER_LEFT": "👋",
     "OVERDOSE": "🤢",
+    "HIT_FEED_BLOCKED": "⚠️",
 }
 
 

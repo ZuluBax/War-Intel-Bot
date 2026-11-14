@@ -58,6 +58,34 @@ def roster_left_event(war_id: int, *, player_id: int, name: str | None) -> WarLo
     )
 
 
+HIT_FEED_BLOCKED_KIND = "HIT_FEED_BLOCKED"
+
+
+def hit_feed_blocked_event(war_id: int, *, access_level_too_low: bool) -> WarLogEvent:
+    """Torn refuses the saved key access to the faction's attacks, so no hits will
+    appear. Without this the only trace is a server log line nobody in Discord sees."""
+    if access_level_too_low:
+        cause = (
+            "the saved Torn API key's access level is too low to read the faction's "
+            "attacks. Run `/setup torn-key` with a Limited (or higher) access key"
+        )
+    else:
+        cause = (
+            "Torn won't let the saved API key read the faction's attacks. A faction "
+            "leader needs to give the key owner's position **Faction API Access** "
+            "(Faction → Controls → Positions), or run `/setup torn-key` with a key "
+            "from a member who has it"
+        )
+    return WarLogEvent(
+        war_id=war_id,
+        kind=HIT_FEED_BLOCKED_KIND,
+        message=(
+            f"Hits can't be shown: {cause}. Hits from this war are filled in once it "
+            "works, as long as the war is still running."
+        ),
+    )
+
+
 OVERDOSE_KIND = "OVERDOSE"
 
 

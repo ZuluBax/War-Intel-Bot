@@ -11,17 +11,24 @@ import pytest
 from sqlalchemy import select
 
 from app.database.database import Database
-from app.database.models import DiscordChannel, Faction, War, WarHit
+from app.database.models import DiscordChannel, Faction, War, WarHit, WarLogEvent
 from app.discord.gateway import GuildGateway
 from app.discord.hit_embeds import OUTSIDE_HIT_COLOUR, WAR_HIT_COLOUR
 from app.discord.war_channels import WarChannelManager, WarLogBoard
 from app.torn.attacks import AttackService
 from app.torn.client import TornClient
-from app.torn.errors import TornAPIAccessLevelError
+from app.torn.errors import (
+    TornAPIAccessLevelError,
+    TornAPIPrivateDataError,
+    TornAPIRateLimitError,
+    TornAPIRequestError,
+    error_for_code,
+)
 from app.utils.time import utcnow
 from app.war.detector import WarState
 from app.war.hits import WarHitService
 from app.war.roster import Roster, RosterDiff
+from app.war.warlog import HIT_FEED_BLOCKED_KIND
 from tests.conftest import FakeTornClient
 from tests.fake_gateway import FakeGuildGateway, discord_http_error
 from tests.test_war_manager import (
@@ -586,3 +593,71 @@ async def test_a_war_first_seen_already_finished_is_not_backfilled(database: Dat
     await mgr.tick()
 
     assert hits.calls == []
+
+
+# --- hit feed refused by Torn: one #war-log notice per war -------------------
+
+
+async def _blocked_notices(database: Database, war_id: int) -> list[WarLogEvent]:
+    async with database.session() as session:
+        rows = await session.scalars(
+            select(WarLogEvent).where(
+                WarLogEvent.war_id == war_id, WarLogEvent.kind == HIT_FEED_BLOCKED_KIND
+            )
+        )
+        return list(rows)
+
+
+def test_torn_error_7_is_a_private_data_error() -> None:
+    err = error_for_code(7, "Incorrect ID-entity relation")
+    assert type(err) is TornAPIPrivateDataError
+    assert isinstance(err, TornAPIRequestError)  # existing handlers still catch it
+
+
+async def test_a_refused_hit_feed_posts_one_war_log_notice(database: Database) -> None:
+    war_id = await _open_war(database)
+    hits = _StubHits(fail=error_for_code(7, "Incorrect ID-entity relation"))
+    publisher = _StubPublisher()
+    mgr = _wire(database, hits, roster=_roster_for(war_id), publisher=publisher)
+
+    for _ in range(3):
+        await mgr.refresh_active()
+
+    notices = await _blocked_notices(database, war_id)
+    assert len(notices) == 1
+    assert "Faction API Access" in notices[0].message
+    assert "/setup torn-key" in notices[0].message
+    assert notices[0].posted_message_id is None  # queued for #war-log
+    assert war_id in publisher.log_calls
+
+
+async def test_the_notice_is_not_repeated_after_a_restart(database: Database) -> None:
+    war_id = await _open_war(database)
+    for _ in range(2):  # a fresh manager = the bot restarted (in-memory state lost)
+        hits = _StubHits(fail=error_for_code(7, "Incorrect ID-entity relation"))
+        mgr = _wire(database, hits, roster=_roster_for(war_id), publisher=_StubPublisher())
+        await mgr.refresh_active()
+
+    assert len(await _blocked_notices(database, war_id)) == 1
+
+
+async def test_a_key_with_too_low_access_also_posts_the_notice(database: Database) -> None:
+    war_id = await _open_war(database)
+    hits = _StubHits(fail=TornAPIAccessLevelError("Torn API error 16: Access level"))
+    mgr = _wire(database, hits, roster=_roster_for(war_id), publisher=_StubPublisher())
+
+    await mgr.refresh_active()
+
+    notices = await _blocked_notices(database, war_id)
+    assert len(notices) == 1
+    assert "access level" in notices[0].message
+
+
+async def test_a_temporary_torn_error_posts_no_notice(database: Database) -> None:
+    war_id = await _open_war(database)
+    hits = _StubHits(fail=TornAPIRateLimitError("Torn API error 5: Too many requests"))
+    mgr = _wire(database, hits, roster=_roster_for(war_id), publisher=_StubPublisher())
+
+    await mgr.refresh_active()
+
+    assert await _blocked_notices(database, war_id) == []
