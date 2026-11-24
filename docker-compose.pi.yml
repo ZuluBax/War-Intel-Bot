@@ -15,6 +15,13 @@ services:
     env_file: .env           # DISCORD_TOKEN, CONFIG_ENCRYPTION_KEY, DATABASE_URL, ...
     environment:
       LOG_FORMAT: json
+    # Use public DNS directly. The Pi's own DNS setup has changed over time
+    # (AdGuard Home was removed on 2026-11-22), and when the container
+    # inherited a dead resolver it could no longer find the Supabase database,
+    # so war detection silently stopped.
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     volumes:
       - bot_data:/app/data
       - bot_config:/app/config
